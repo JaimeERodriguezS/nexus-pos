@@ -117,12 +117,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
+
 STATIC_URL = '/static/'
+
+# ESTA LÍNEA ES LA SALVADORA (Tiene que estar fuera de cualquier IF)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Configuración extra para producción
 if not DEBUG:
-    # Configuración para cuando estemos en Internet
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    
 LOGIN_REDIRECT_URL = 'home' 
 
 # A dónde ir después de cerrar sesión
