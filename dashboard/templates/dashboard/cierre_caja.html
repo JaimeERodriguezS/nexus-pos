@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Cierres | Nexus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light container mt-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">📅 Cierres de Caja Diarios</h4>
+                    <a href="{% url 'home' %}" class="btn btn-outline-light btn-sm">Volver al Dashboard</a>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover table-striped mb-0 text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Ventas Realizadas</th>
+                                <th>Total en Caja</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in cierres %}
+                            <tr>
+                                <td class="fw-bold text-capitalize">
+                                    {{ c.fecha_dia|date:"l d F Y" }}
+                                </td>
+                                <td>{{ c.cantidad_ventas }} tickets</td>
+                                <td class="text-success fw-bold fs-5">
+                                    ${{ c.total_dia }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Cerrado ✅</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="p-4 text-muted">
+                                    Aún no hay ventas registradas en el historial.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

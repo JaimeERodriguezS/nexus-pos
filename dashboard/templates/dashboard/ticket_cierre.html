@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cierre del Día</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            width: 80mm;
+            margin: 0;
+            padding: 10px;
+            font-size: 12px;
+        }
+        .centrado { text-align: center; }
+        .negrita { font-weight: bold; }
+        .linea { border-bottom: 1px dashed black; margin: 10px 0; }
+        .tabla { width: 100%; text-align: left; }
+        .derecha { text-align: right; }
+        .titulo-grande { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+        
+        @media print { .no-imprimir { display: none; } }
+    </style>
+</head>
+<body>
+
+    <div class="centrado">
+        <div class="titulo-grande">CIERRE DE CAJA (Z)</div>
+        <div>{{ empresa.nombre }}</div>
+        <div>Fecha: {{ fecha|date:"d/m/Y" }}</div>
+        <div>Cajero: {{ usuario.username }}</div>
+    </div>
+
+    <div class="linea"></div>
+
+    <div>
+        <span class="negrita">VENTAS TOTALES:</span>
+        <div class="derecha titulo-grande">${{ total_dinero }}</div>
+    </div>
+    
+    <div>
+        <span>Tickets emitidos:</span>
+        <span class="derecha" style="float:right;">{{ cantidad_ventas }}</span>
+    </div>
+
+    <div class="linea"></div>
+
+    <div class="centrado negrita">RESUMEN POR PRODUCTO</div>
+    <br>
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Prod.</th>
+                <th>Cant.</th>
+                <th class="derecha">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in resumen_productos %}
+            <tr>
+                <td>{{ item.producto__nombre|truncatechars:12 }}</td>
+                <td class="centrado">{{ item.cantidad_total }}</td>
+                <td class="derecha">${{ item.dinero_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="linea"></div>
+    
+    <div class="centrado">
+        <small>Fin del reporte</small>
+        <br>
+        <small>{% now "H:i" %} hrs</small>
+    </div>
+
+    <div class="centrado no-imprimir" style="margin-top: 20px;">
+        <button onclick="window.print()">🖨️ Imprimir Cierre</button>
+        <br><br>
+        <a href="{% url 'home' %}">⬅️ Volver</a>
+    </div>
+
+    <script>
+        window.onload = function() { window.print(); }
+    </script>
+</body>
+</html>

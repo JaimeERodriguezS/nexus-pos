@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Boleta #{{ venta.id }}</title>
+    <style>
+        /* Estilos para parecer un ticket real */
+        body {
+            font-family: 'Courier New', Courier, monospace; /* Fuente tipo máquina */
+            width: 80mm; /* Ancho estándar de impresora térmica */
+            margin: 0;
+            padding: 5px;
+            font-size: 12px;
+        }
+        .centrado { text-align: center; }
+        .linea { border-bottom: 1px dashed black; margin: 5px 0; }
+        .tabla-productos { width: 100%; text-align: left; }
+        .total { font-size: 16px; font-weight: bold; text-align: right; margin-top: 10px; }
+        
+        /* Ocultar el botón al imprimir */
+        @media print {
+            .no-imprimir { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="centrado">
+        <h3>{{ venta.empresa.nombre }}</h3>
+        <p>RUT: {{ venta.empresa.rut }}</p>
+        <p>{{ venta.fecha|date:"d/m/Y H:i" }}</p>
+        <p>Ticket de Venta N° {{ venta.id }}</p>
+    </div>
+
+    <div class="linea"></div>
+
+    <table class="tabla-productos">
+        <thead>
+            <tr>
+                <th>Cant.</th>
+                <th>Producto</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in detalles %}
+            <tr>
+                <td>{{ item.cantidad }}</td>
+                <td>{{ item.producto.nombre|truncatechars:15 }}</td> <td style="text-align: right;">${{ item.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="linea"></div>
+
+    <div class="total">
+        TOTAL: ${{ venta.total }}
+    </div>
+
+    <div class="centrado" style="margin-top: 20px;">
+        <p>¡Gracias por su compra!</p>
+    </div>
+
+    <div class="centrado no-imprimir" style="margin-top: 20px;">
+        <button onclick="window.print()">🖨️ Imprimir</button>
+        <br><br>
+        <a href="{% url 'nueva_venta' %}">⬅️ Volver a Vender</a>
+    </div>
+
+    <script>
+        // Opcional: Imprimir automáticamente apenas cargue
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

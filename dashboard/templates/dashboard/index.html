@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nexus | {{ empresa.nombre }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1">Sistema</span>
+    
+    <div class="d-flex align-items-center text-white">
+        <span class="me-3">Hola, {{ user.username }}</span>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+        </form>
+    </div>
+  </div>
+</nav>
+
+<div class="row mb-4">
+    
+<div class="col-md-6 col-12 mb-3">
+    <div class="card shadow-sm border-success bg-success text-white h-100">
+        <div class="card-body">
+            <h5 class="card-title">💰 Ventas de Hoy</h5>
+            <h2 class="display-4">${{ total_vendido }}</h2>
+            <p class="card-text">Dinero en caja</p>
+        </div>
+<div class="card-footer bg-success border-top border-light">
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'historial_caja' %}" class="text-white text-decoration-none small">
+            📅 Historial
+        </a>
+        
+        <a href="{% url 'imprimir_cierre' %}" class="btn btn-light btn-sm text-success fw-bold">
+            🖨️ Cerrar Caja Hoy
+        </a>
+    </div>
+</div>
+    </div>
+</div>
+
+    <div class="col-md-6 col-12 mb-3">
+        <div class="card shadow-sm card-alerta h-100"> <div class="card-body">
+                <h5 class="card-title text-danger">⚠️ Alertas de Stock</h5>
+                <h2 class="display-4">{{ alertas_count }}</h2>
+                <p class="card-text">Productos críticos</p>
+            </div>
+        </div>
+    </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">🔥 Top Productos Más Vendidos</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="miGraficoVentas" height="100"></canvas>
+    </div>
+</div>
+</div>
+<div class="d-grid gap-2 mb-4">
+    <a href="{% url 'nueva_venta' %}" class="btn btn-primary btn-lg">➕ Registrar Nueva Venta</a>
+</div>
+<div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Inventario Actual</h5>
+        <a href="{% url 'agregar_producto' %}" class="btn btn-sm btn-primary">➕ Nuevo Producto</a>
+    </div>
+    
+    <div class="card-body p-0">
+        <table class="table table-striped table-hover mb-0">
+            
+            <thead class="table-light">
+                <tr>
+                    <th>Producto</th>
+                    <th>SKU</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in productos %}
+                <tr class="align-middle"> <td>{{ p.nombre }}</td>
+                    <td>{{ p.sku }}</td>
+                    <td>${{ p.precio_venta }}</td>
+                    <td class="fw-bold">{{ p.stock_actual }}</td>
+                    <td>
+                        {% if p.stock_actual <= p.stock_critico %}
+                            <span class="badge bg-danger">Crítico</span>
+                        {% else %}
+                            <span class="badge bg-success">OK</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'editar_producto' p.id %}" class="btn btn-outline-primary btn-sm border-0" title="Editar">
+                            ✏️
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        No hay productos registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{ labels_grafico|json_script:"mis-labels" }}
+{{ data_grafico|json_script:"mis-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Obtenemos el contexto del canvas
+    const ctx = document.getElementById('miGraficoVentas').getContext('2d');
+    
+    // Recibimos los datos limpios desde Django (usando el filtro safe)
+// Leemos el contenido de las etiquetas ocultas y lo convertimos a JSON real
+const etiquetas = JSON.parse(document.getElementById('mis-labels').textContent);
+const valores = JSON.parse(document.getElementById('mis-data').textContent);
+
+    new Chart(ctx, {
+        type: 'bar', // Tipo de gráfico: 'bar', 'line', 'pie', etc.
+        data: {
+            labels: etiquetas,
+            datasets: [{
+                label: 'Unidades Vendidas',
+                data: valores,
+                backgroundColor: 'rgba(13, 110, 253, 0.7)', // Color azul Bootstrap
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1 // Para que no muestre decimales (no vendes 1.5 panes)
+                    }
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
