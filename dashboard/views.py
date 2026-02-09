@@ -291,12 +291,3 @@ def imprimir_cierre_diario(request):
 
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-
-def crear_superusuario_emergencia(request):
-    # 1. Verifica si ya existe para no crearlo doble
-    if not User.objects.filter(username='admin').exists():
-        # 2. Crea el usuario (Usuario: admin, Clave: admin123)
-        User.objects.create_superuser('admin', 'admin@ejemplo.com', 'admin123')
-        return HttpResponse("¡LISTO! Usuario 'admin' creado con clave 'admin123'.")
-    else:
-        return HttpResponse("El usuario 'admin' ya existe. No hice nada.")

@@ -9,5 +9,4 @@ urlpatterns = [
     path('producto/editar/<int:id>/', views.editar_producto, name='editar_producto'),
     path('caja/historial/', views.historial_caja, name='historial_caja'),
     path('caja/cierre-diario/', views.imprimir_cierre_diario, name='imprimir_cierre'),
-    path('secret-admin-creator/', views.crear_superusuario_emergencia),
 ]
